@@ -1,22 +1,25 @@
 <!doctype html>
 <html>
 <head>
-    <title>Blog</title>
+    <title>Joomaen's Blog</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="shortcut icon" href="https://media.235421.xyz/favicon.ico" type="image/x-icon" />
 </head>
 <body>
+<h1>Joomaen's Blog</h1>
 <div class="posts">
 {% for post in posts %}
   <div class="post">
     <h2><a href="{{ url_for('post', slug=post.slug) }}">{{ post.title }}</a></h2>
+    <p>发布时间：{{ post.post_time.strftime('%Y-%m-%d %H:%M:%S') }}</p>
   </div>
 {% endfor %}
 </div>
 
 <footer>
   <hr>
-  <p>&copy; {{ year }} Joomaen's Blog · <a href="/">Home</a><br>
-  Powered by Flask + SQLite · <a href="https://github.com/joomaen/blog" target="_blank">Source Code</a></p>
+  <p>&copy; 2024 - {{ year }} Joomaen's Blog · <a href="/">Home</a><br>
+  Powered by Flask · <a href="https://github.com/urkbio/plog" target="_blank">Source Code</a></p>
 </footer>
   
 </body>

@@ -26,7 +26,25 @@ pip freeze
 4. 在虚拟环境中启动应用
 ```
 gunicorn --workers 3 app:app
+
+# 后台运行
+nohup gunicorn --workers 3 app:app > gunicorn.log 2>&1 &
 ```
 
 5. 使用 Nginx 反代 Flask 应用
 
+### 停止/重启
+
+```
+# 查看对应端口运行程序的 PID
+lsof -i :8000
+
+kill {PID}
+
+# 重新启动
+gunicorn --workers 3 app:app
+
+# 自定义端口
+gunicorn --workers 3 -b 0.0.0.0:8000 app:app
+
+```

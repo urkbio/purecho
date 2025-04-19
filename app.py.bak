@@ -11,27 +11,10 @@ def index():
     posts = []
     for filename in sorted(os.listdir(POST_DIR), reverse=True):
         if filename.endswith('.md'):
-            # 获取文件的路径
-            file_path = os.path.join(POST_DIR, filename)
-            
-            # 获取文件的最后修改时间
-            timestamp = os.path.getmtime(file_path)
-            post_time = datetime.fromtimestamp(timestamp)
-            
-            # 读取文件的第一行作为标题
-            with open(file_path, 'r') as f:
+            with open(os.path.join(POST_DIR, filename), 'r') as f:
                 first_line = f.readline().strip()
-            
             slug = filename[:-3]
-            posts.append({
-                'title': first_line,
-                'slug': slug,
-                'post_time': post_time  # 将发布时间加入到文章字典中
-            })
-    
-    # 按时间倒序排序
-    posts = sorted(posts, key=lambda x: x['post_time'], reverse=True)
-    
+            posts.append({'title': first_line, 'slug': slug})
     # 获取当前年份
     current_year = datetime.now().year
 

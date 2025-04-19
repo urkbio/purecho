@@ -1,1 +1,18 @@
+# 忽略虚拟环境文件夹
+venv/
+env/
+.env/
+virtualenv/
+
+# 忽略 Python 编译文件
+__pycache__/
+*.pyc
+*.pyo
+
+# 忽略 IDE 配置文件
+.vscode/
+.idea/
+
+# 忽略操作系统文件
 .DS_Store
+Thumbs.db
