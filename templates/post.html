@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+    <title>{{ title }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<h1>{{ title }}</h1>
+<div>{{ content|safe }}</div>
+<a href="{{ url_for('index') }}">返回首页</a>
+<footer>
+    <hr>
+    <p>&copy; {{ year }} Joomaen's Blog · <a href="/">Home</a></p>
+    <p>Powered by Flask + SQLite · <a href="https://github.com/joomaen/blog" target="_blank">Source Code</a></p>
+  </footer>
+  
+</body>
+</html>
