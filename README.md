@@ -15,7 +15,7 @@ python3 -m venv venv
 ```
 source venv/bin/activate
 
-pip install flask markdown gunicorn
+pip install -r requirements.txt
 ```
 
 3. 确认依赖安装
