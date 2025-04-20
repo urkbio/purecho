@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+{% block header %}
+<nav class="navigation">
+  <a href="/" class="nav-item">首页</a>
+  {% for page in pages %}
+    <a href="{{ url_for('page', slug=page.slug) }}" class="nav-item">{{ page.title }}</a>
+  {% endfor %}
+</nav>
+{% endblock %}
+
+{% block content %}{% endblock %}
+
+<footer>
+    <hr>
+    <p>&copy; 2024 - {{ year }} <a href="/">Joomaen's Blog</a> · Powered by Flask + SQLite · <a href="https://github.com/urkbio/plog" target="_blank">Source Code</a></p>
+</footer>
+
+</body>
+</html>

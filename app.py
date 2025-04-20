@@ -1,66 +1,175 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Response, session, flash
+from models import db, Post, Tag, AdminPassword
+from config import Config
+from feed import generate_feed
+from datetime import datetime
+from functools import wraps
 import os
 import markdown
-from datetime import datetime
 
 app = Flask(__name__)
-POST_DIR = 'posts'
+app.config.from_object(Config)
+app.secret_key = os.urandom(24)  # 设置session密钥
+db.init_app(app)
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if not session.get('logged_in'):
+            return redirect(url_for('login'))
+        return f(*args, **kwargs)
+    return decorated_function
 
 @app.route('/')
-def index():
-    posts = []
-    for filename in sorted(os.listdir(POST_DIR), reverse=True):
-        if filename.endswith('.md'):
-            # 获取文件的路径
-            file_path = os.path.join(POST_DIR, filename)
-            
-            # 获取文件的最后修改时间
-            timestamp = os.path.getmtime(file_path)
-            post_time = datetime.fromtimestamp(timestamp)
-            
-            # 读取文件的第一行作为标题
-            with open(file_path, 'r') as f:
-                first_line = f.readline().strip()
-            
-            slug = filename[:-3]
-            posts.append({
-                'title': first_line,
-                'slug': slug,
-                'post_time': post_time  # 将发布时间加入到文章字典中
-            })
-    
-    # 按时间倒序排序
-    posts = sorted(posts, key=lambda x: x['post_time'], reverse=True)
-    
-    # 获取当前年份
+@app.route('/page/<int:page>')
+def index(page=1):
+    per_page = 10
+    pagination = Post.query.filter_by(is_page=False).order_by(Post.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    posts = pagination.items
+    pages = Post.query.filter_by(is_page=True).all()
     current_year = datetime.now().year
-
-    return render_template('index.html', posts=posts, year=current_year)
+    return render_template('index.html', posts=posts, pages=pages, year=current_year, pagination=pagination)
 
 @app.route('/post/<slug>')
 def post(slug):
-    path = os.path.join(POST_DIR, slug + '.md')
-    if not os.path.exists(path):
-        return '404 Not Found', 404
-    with open(path, 'r') as f:
-        lines = f.readlines()
-    title = lines[0].strip()
-    content = markdown.markdown(''.join(lines[1:]))
-    return render_template('post.html', title=title, content=content)
+    post = Post.query.filter_by(slug=slug).first_or_404()
+    content = markdown.markdown(post.content)
+    current_year = datetime.now().year
+    return render_template('post.html', title=post.title, content=content, year=current_year, post=post)
 
-# Joomaen SHA256加密小写
-@app.route('/5f807bd5c7e70ed44f63449650207122eeb1eee910c67c80e24bbb83e7241228', methods=['GET', 'POST'])
+@app.route('/tag/<name>')
+def tag(name):
+    tag = Tag.query.filter_by(name=name).first_or_404()
+    current_year = datetime.now().year
+    return render_template('tag.html', tag=tag, year=current_year)
+
+@app.route('/page/<slug>')
+def page(slug):
+    page = Post.query.filter_by(slug=slug, is_page=True).first_or_404()
+    content = markdown.markdown(page.content)
+    current_year = datetime.now().year
+    return render_template('page.html', title=page.title, content=content, year=current_year)
+
+@app.route('/feed.xml')
+def feed():
+    posts = Post.query.filter_by(is_page=False).order_by(Post.created_at.desc()).limit(10).all()
+    feed_content = generate_feed(posts, Config)
+    return Response(feed_content, mimetype='application/rss+xml')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        password = request.form['password']
+        admin_pwd = AdminPassword.query.first()
+        
+        if admin_pwd and admin_pwd.check_password(password):
+            session['logged_in'] = True
+            return redirect(url_for('admin'))
+        flash('密码错误')
+    
+    current_year = datetime.now().year
+    return render_template('login.html', year=current_year)
+
+@app.route('/change-password', methods=['POST'])
+@login_required
+def change_password():
+    old_password = request.form['old_password']
+    new_password = request.form['new_password']
+    admin_pwd = AdminPassword.query.first()
+    
+    if admin_pwd and admin_pwd.check_password(old_password):
+        admin_pwd.set_password(new_password)
+        db.session.commit()
+        flash('密码修改成功')
+    else:
+        flash('原密码错误')
+    
+    return redirect(url_for('admin'))
+
+@app.route('/plog-admin')
+@login_required
 def admin():
+    return redirect(url_for('admin_posts'))
+
+@app.route('/plog-admin/password')
+@login_required
+def admin_password():
+    current_year = datetime.now().year
+    return render_template('admin_password.html', year=current_year)
+
+@app.route('/plog-admin/write', methods=['GET', 'POST'])
+@login_required
+def admin_write():
     if request.method == 'POST':
         title = request.form['title'].strip()
         content = request.form['content']
-        now = datetime.now().strftime('%Y-%m-%d-%H%M%S')
-        filename = f"{now}.md"
-        with open(os.path.join(POST_DIR, filename), 'w') as f:
-            f.write(title + '\n' + content)
-        return redirect(url_for('index'))
-    return render_template('admin.html')
+        tags = request.form['tags'].strip()
+        is_page = 'is_page' in request.form
+        slug = request.form['slug'].strip() or datetime.now().strftime('%Y-%m-%d-%H%M%S')
+        
+        post = Post(title=title, content=content, is_page=is_page, slug=slug)
+        
+        # 处理标签
+        if tags:
+            tag_names = [t.strip() for t in tags.split(',')]
+            for tag_name in tag_names:
+                tag = Tag.query.filter_by(name=tag_name).first()
+                if not tag:
+                    tag = Tag(name=tag_name)
+                post.tags.append(tag)
+        
+        db.session.add(post)
+        db.session.commit()
+        return redirect(url_for('admin_posts'))
+    
+    current_year = datetime.now().year
+    return render_template('admin_write.html', year=current_year)
+
+@app.route('/plog-admin/posts')
+@login_required
+def admin_posts():
+    posts = Post.query.order_by(Post.created_at.desc()).all()
+    current_year = datetime.now().year
+    return render_template('admin_posts.html', posts=posts, year=current_year)
+
+@app.route('/edit/<int:id>', methods=['GET', 'POST'])
+def edit(id):
+    post = Post.query.get_or_404(id)
+    if request.method == 'POST':
+        post.title = request.form['title'].strip()
+        post.content = request.form['content']
+        post.is_page = 'is_page' in request.form
+        post.tags.clear()
+        
+        tags = request.form['tags'].strip()
+        if tags:
+            tag_names = [t.strip() for t in tags.split(',')]
+            for tag_name in tag_names:
+                tag = Tag.query.filter_by(name=tag_name).first()
+                if not tag:
+                    tag = Tag(name=tag_name)
+                post.tags.append(tag)
+        
+        db.session.commit()
+        return redirect(url_for('admin'))
+    
+    current_year = datetime.now().year
+    return render_template('edit.html', post=post, year=current_year)
+
+@app.route('/delete/<int:id>')
+def delete(id):
+    post = Post.query.get_or_404(id)
+    db.session.delete(post)
+    db.session.commit()
+    return redirect(url_for('admin'))
 
 if __name__ == '__main__':
-    os.makedirs(POST_DIR, exist_ok=True)
+    with app.app_context():
+        db.create_all()
+        # 初始化管理员密码
+        if not AdminPassword.query.first():
+            admin_pwd = AdminPassword()
+            admin_pwd.set_password('admin')  # 设置初始密码为'admin'
+            db.session.add(admin_pwd)
+            db.session.commit()
     app.run(debug=True)

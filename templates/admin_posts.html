@@ -1,0 +1,31 @@
+{% extends "admin_base.html" %}
+
+{% block title %}管理文章 - 管理后台{% endblock %}
+
+{% block admin_content %}
+<h2>已发布的文章和页面</h2>
+<div class="posts-admin">
+    {% for post in posts %}
+    <div class="post-item">
+        <h3>{{ post.title }}</h3>
+        <div class="post-meta-line">
+            <span>发布时间：{{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+            <span>最后编辑：{{ post.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
+        </div>
+        <div class="post-type-tags">
+            <span class="post-type">类型：{{ '独立页面' if post.is_page else '文章' }}</span>
+            <div class="post-tags">
+                <span>标签：</span>
+                {% for tag in post.tags %}
+                <span class="tag">{{ tag.name }}</span>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="actions">
+            <a href="{{ url_for('edit', id=post.id) }}" class="button">编辑</a>
+            <a href="{{ url_for('delete', id=post.id) }}" class="button delete" onclick="return confirm('确定要删除吗？')">删除</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

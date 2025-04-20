@@ -1,0 +1,36 @@
+{% extends "admin_base.html" %}
+
+{% block title %}写新文章 - 管理后台{% endblock %}
+
+{% block admin_content %}
+<h2>写新文章</h2>
+<form method="post">
+    <div class="form-group">
+        <label for="title">标题：</label>
+        <input type="text" id="title" name="title" placeholder="标题" required>
+    </div>
+    
+    <div class="form-group">
+        <label for="content">内容：</label>
+        <textarea id="content" name="content" rows="10" cols="50" placeholder="正文内容" required></textarea>
+    </div>
+    
+    <div class="form-group">
+        <label for="tags">标签（用逗号分隔）：</label>
+        <input type="text" id="tags" name="tags" placeholder="标签1, 标签2">
+    </div>
+    
+    <div class="form-group">
+        <label for="slug">URL标识符（可选）：</label>
+        <input type="text" id="slug" name="slug" placeholder="about">
+    </div>
+    
+    <div class="form-group">
+        <label>
+            <input type="checkbox" name="is_page"> 作为独立页面发布
+        </label>
+    </div>
+    
+    <button type="submit">发布</button>
+</form>
+{% endblock %}

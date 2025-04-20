@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+
+{% block header %}{% endblock %}
+
+{% block content %}
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        .admin-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: 220px;
+            background: #f5f5f5;
+            padding: 20px;
+            border-right: 1px solid #ddd;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            left: 0;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            margin-left: 220px;
+        }
+
+        .sidebar h1 {
+            margin-top: 0;
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+
+        .nav-links {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-links li {
+            margin-bottom: 10px;
+        }
+
+        .nav-links a {
+            display: block;
+            padding: 10px;
+            color: #333;
+            text-decoration: none;
+            border-radius: 4px;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            background: #e0e0e0;
+        }
+
+        .hamburger {
+            display: none;
+            font-size: 28px;
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            padding: 8px 12px;
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .hamburger:hover {
+            background: #e0e0e0;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+                z-index: 999;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                padding-top: 60px;
+            }
+
+            .hamburger {
+                display: block;
+            }
+        }
+    </style>
+    <button class="hamburger">☰</button>
+    <div class="admin-container">
+        <nav class="sidebar">
+            <h1>管理后台</h1>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('admin_password') }}" {% if request.endpoint == 'admin_password' %}class="active"{% endif %}>修改密码</a></li>
+                <li><a href="{{ url_for('admin_write') }}" {% if request.endpoint == 'admin_write' %}class="active"{% endif %}>写新文章</a></li>
+                <li><a href="{{ url_for('admin_posts') }}" {% if request.endpoint == 'admin_posts' %}class="active"{% endif %}>管理文章</a></li>
+            </ul>
+        </nav>
+        <main class="main-content">
+            {% with messages = get_flashed_messages() %}
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="flash-message">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {% block admin_content %}{% endblock %}
+        </main>
+    </div>
+
+    <script>
+        document.querySelector('.hamburger').addEventListener('click', function() {
+            document.querySelector('.sidebar').classList.toggle('active');
+        });
+
+        // 在移动端点击导航链接后自动关闭侧边栏
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                link.addEventListener('click', () => {
+                    document.querySelector('.sidebar').classList.remove('active');
+                });
+            });
+        }
+    </script>
+{% endblock %}
