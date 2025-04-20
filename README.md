@@ -23,7 +23,12 @@ pip install -r requirements.txt
 pip freeze
 ```
 
-4. 在虚拟环境中启动应用
+4. 运行初始化脚本
+```
+python init_db.py
+```
+
+5. 在虚拟环境中启动应用
 ```
 gunicorn --workers 3 app:app
 
@@ -31,7 +36,7 @@ gunicorn --workers 3 app:app
 nohup gunicorn --workers 3 app:app > gunicorn.log 2>&1 &
 ```
 
-5. 使用 Nginx 反代 Flask 应用
+6. 使用 Nginx 反代 Flask 应用
 
 ### 停止/重启
 

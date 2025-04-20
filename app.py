@@ -164,12 +164,4 @@ def delete(id):
     return redirect(url_for('admin'))
 
 if __name__ == '__main__':
-    with app.app_context():
-        db.create_all()
-        # 初始化管理员密码
-        if not AdminPassword.query.first():
-            admin_pwd = AdminPassword()
-            admin_pwd.set_password('admin')  # 设置初始密码为'admin'
-            db.session.add(admin_pwd)
-            db.session.commit()
     app.run(debug=True)
