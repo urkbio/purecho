@@ -30,10 +30,10 @@ python init_db.py
 
 5. 在虚拟环境中启动应用
 ```
-gunicorn --workers 3 app:app
+gunicorn --workers 3 -b 0.0.0.0:5000 app:app
 
 # 后台运行
-nohup gunicorn --workers 3 app:app > gunicorn.log 2>&1 &
+nohup gunicorn --workers 3 -b 0.0.0.0:5000 app:app > gunicorn.log 2>&1 &
 ```
 
 6. 使用 Nginx 反代 Flask 应用
@@ -42,14 +42,11 @@ nohup gunicorn --workers 3 app:app > gunicorn.log 2>&1 &
 
 ```
 # 查看对应端口运行程序的 PID
-lsof -i :8000
+lsof -i :5000
 
 kill {PID}
 
 # 重新启动
-gunicorn --workers 3 app:app
-
-# 自定义端口
-gunicorn --workers 3 -b 0.0.0.0:8000 app:app
+gunicorn --workers 3 -b 0.0.0.0:5000 app:app
 
 ```

@@ -19,3 +19,6 @@ Thumbs.db
 
 # SQLite 数据库文件
 blog.db
+
+# 忽略日志文件
+*.log

@@ -9,7 +9,8 @@ import markdown
 
 app = Flask(__name__)
 app.config.from_object(Config)
-app.secret_key = os.urandom(24)  # 设置session密钥
+# 使用配置文件中的SECRET_KEY
+app.secret_key = app.config['SECRET_KEY']
 db.init_app(app)
 
 def login_required(f):
