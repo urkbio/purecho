@@ -1,6 +1,7 @@
 from feedgen.feed import FeedGenerator
 from datetime import datetime, timezone
 from flask import url_for
+import markdown
 
 def generate_feed(posts, config):
     fg = FeedGenerator()
@@ -14,7 +15,7 @@ def generate_feed(posts, config):
             fe = fg.add_entry()
             fe.title(post.title)
             fe.link(href=f"{config.SITE_URL}{url_for('post', slug=post.slug)}")
-            fe.description(post.content)
+            fe.description(markdown.markdown(post.content))
             # 确保时间戳包含UTC时区信息
             fe.pubDate(post.created_at.replace(tzinfo=timezone.utc) if post.created_at.tzinfo is None else post.created_at)
             fe.updated(post.updated_at.replace(tzinfo=timezone.utc) if post.updated_at.tzinfo is None else post.updated_at)
