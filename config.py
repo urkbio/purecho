@@ -11,4 +11,4 @@ class Config:
     # RSS配置
     SITE_TITLE = "Joomaen's Blog"
     SITE_DESCRIPTION = "A simple blog powered by Flask"
-    SITE_URL = 'http://localhost:5000'  # 请在生产环境中修改为实际URL
+    SITE_URL = os.environ.get('SITE_URL', 'http://localhost:5000')  # 从环境变量获取站点URL，默认为localhost

@@ -4,8 +4,12 @@ from config import Config
 from feed import generate_feed
 from datetime import datetime
 from functools import wraps
+from dotenv import load_dotenv
 import os
 import markdown
+
+# 加载.env文件中的环境变量
+load_dotenv()
 
 app = Flask(__name__)
 app.config.from_object(Config)

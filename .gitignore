@@ -18,6 +18,9 @@ __pycache__/
 Thumbs.db
 
 # SQLite 数据库文件
+
+# 环境变量文件
+.env
 blog.db
 
 # 忽略日志文件
