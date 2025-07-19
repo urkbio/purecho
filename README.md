@@ -58,6 +58,6 @@ kill {PID}
 # 重新启动
 source venv/bin/activate
 
-gunicorn --workers 3 -b 0.0.0.0:5000 app:app
+nohup gunicorn --workers 3 -b 0.0.0.0:5000 app:app > gunicorn.log 2>&1 &
 
 ```
