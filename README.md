@@ -23,12 +23,21 @@ pip install -r requirements.txt
 pip freeze
 ```
 
-4. 运行初始化脚本
+4. 配置环境变量
+```
+# 复制环境变量示例文件
+cp .env.example .env
+
+# 编辑.env文件，修改必要的配置
+vim .env
+```
+
+5. 运行初始化脚本
 ```
 python init_db.py
 ```
 
-5. 在虚拟环境中启动应用
+6. 在虚拟环境中启动应用
 ```
 gunicorn --workers 3 -b 0.0.0.0:5000 app:app
 
@@ -36,7 +45,7 @@ gunicorn --workers 3 -b 0.0.0.0:5000 app:app
 nohup gunicorn --workers 3 -b 0.0.0.0:5000 app:app > gunicorn.log 2>&1 &
 ```
 
-6. 使用 Nginx 反代 Flask 应用
+7. 使用 Nginx 反代 Flask 应用
 
 ### 停止/重启
 
