@@ -1,16 +1,21 @@
+# 标准库
+import os
+import markdown
+from datetime import datetime
+from functools import wraps
+
+# 第三方库
 from flask import Flask, render_template, request, redirect, url_for, Response, session, flash
+from dotenv import load_dotenv
+
+# 本地应用模块
 from models import db, Post, Tag, AdminPassword
 
-from dotenv import load_dotenv
-# 加载.env文件中的环境变量
+# 加载环境变量
 load_dotenv()
 
 from config import Config
 from feed import generate_feed
-from datetime import datetime
-from functools import wraps
-import os
-import markdown
 
 app = Flask(__name__)
 app.config.from_object(Config)
