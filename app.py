@@ -58,7 +58,7 @@ def page(slug):
 @app.route('/feed.xml')
 def feed():
     posts = Post.query.filter_by(is_page=False).order_by(Post.created_at.desc()).limit(10).all()
-    feed_content = generate_feed(posts, Config)
+    feed_content = generate_feed(posts, Config())
     return Response(feed_content, mimetype='application/rss+xml')
 
 @app.route('/login', methods=['GET', 'POST'])
