@@ -170,6 +170,10 @@ def edit(id):
                 post.tags.append(tag)
         
         db.session.commit()
+        
+        # 自动清理没有文章的标签
+        cleanup_empty_tags()
+        
         return redirect(url_for('admin'))
     
     current_year = datetime.now().year
@@ -180,7 +184,32 @@ def delete(id):
     post = Post.query.get_or_404(id)
     db.session.delete(post)
     db.session.commit()
+    
+    # 自动清理没有文章的标签
+    cleanup_empty_tags()
+    
     return redirect(url_for('admin'))
+
+def cleanup_empty_tags():
+    """自动清理没有文章的标签"""
+    try:
+        # 查找所有标签
+        all_tags = Tag.query.all()
+        deleted_count = 0
+        
+        for tag in all_tags:
+            # 检查标签下是否有文章
+            if tag.posts.count() == 0:
+                db.session.delete(tag)
+                deleted_count += 1
+        
+        if deleted_count > 0:
+            db.session.commit()
+            print(f'自动清理了 {deleted_count} 个空标签')
+        
+    except Exception as e:
+        print(f'清理空标签时出错：{str(e)}')
+        db.session.rollback()
 
 @app.route('/tags')
 def tags():
