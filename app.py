@@ -181,5 +181,12 @@ def delete(id):
     db.session.commit()
     return redirect(url_for('admin'))
 
+@app.route('/tags')
+def tags():
+    # 获取所有标签，按名称排序
+    tags = Tag.query.order_by(Tag.name).all()
+    current_year = datetime.now().year
+    return render_template('tags.html', tags=tags, year=current_year)
+
 if __name__ == '__main__':
     app.run(debug=True)

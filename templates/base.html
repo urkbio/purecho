@@ -9,6 +9,7 @@
 {% block header %}
 <nav class="navigation">
   <a href="/" class="nav-item">首页</a>
+  <a href="{{ url_for('tags') }}" class="nav-item">标签</a>
   {% for page in pages %}
     <a href="{{ url_for('page', slug=page.slug) }}" class="nav-item">{{ page.title }}</a>
   {% endfor %}
