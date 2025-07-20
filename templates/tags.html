@@ -12,7 +12,7 @@
                 <div class="tag-item">
                     <a href="{{ url_for('tag', name=tag.name) }}" class="tag-link">
                         <span class="tag-name">{{ tag.name }}</span>
-                        <span class="tag-count">{{ tag.posts|length }}</span>
+                        <span class="tag-count">{{ tag.posts.count() }}</span>
                     </a>
                 </div>
             {% endfor %}

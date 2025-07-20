@@ -1,11 +1,12 @@
 # 标准库
 import os
 import markdown
+import json
 from datetime import datetime
 from functools import wraps
 
 # 第三方库
-from flask import Flask, render_template, request, redirect, url_for, Response, session, flash
+from flask import Flask, render_template, request, redirect, url_for, Response, session, flash, send_file
 from dotenv import load_dotenv
 
 # 本地应用模块
@@ -187,6 +188,148 @@ def tags():
     tags = Tag.query.order_by(Tag.name).all()
     current_year = datetime.now().year
     return render_template('tags.html', tags=tags, year=current_year)
+
+@app.route('/plog-admin/export')
+@login_required
+def admin_export():
+    """导出所有数据为JSON文件"""
+    try:
+        # 获取所有数据
+        posts = Post.query.all()
+        tags = Tag.query.all()
+        
+        # 构建导出数据结构
+        export_data = {
+            'version': '1.0',
+            'exported_at': datetime.now().isoformat(),
+            'posts': [],
+            'tags': []
+        }
+        
+        # 导出标签
+        for tag in tags:
+            tag_data = {
+                'id': tag.id,
+                'name': tag.name
+            }
+            export_data['tags'].append(tag_data)
+        
+        # 导出文章
+        for post in posts:
+            post_data = {
+                'id': post.id,
+                'title': post.title,
+                'content': post.content,
+                'created_at': post.created_at.isoformat(),
+                'updated_at': post.updated_at.isoformat(),
+                'is_page': post.is_page,
+                'slug': post.slug,
+                'tags': [tag.name for tag in post.tags]
+            }
+            export_data['posts'].append(post_data)
+        
+        # 创建临时文件到backups文件夹
+        export_filename = f'plog_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+        export_path = os.path.join(os.getcwd(), 'backups', export_filename)
+        
+        with open(export_path, 'w', encoding='utf-8') as f:
+            json.dump(export_data, f, ensure_ascii=False, indent=2)
+        
+        flash(f'数据导出成功！文件：{export_filename}')
+        return send_file(export_path, as_attachment=True, download_name=export_filename)
+        
+    except Exception as e:
+        flash(f'导出失败：{str(e)}')
+        return redirect(url_for('admin'))
+
+@app.route('/plog-admin/import', methods=['GET', 'POST'])
+@login_required
+def admin_import():
+    """导入JSON数据文件"""
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('请选择要导入的文件')
+            return redirect(request.url)
+        
+        file = request.files['file']
+        if file.filename == '':
+            flash('请选择要导入的文件')
+            return redirect(request.url)
+        
+        if not file.filename.endswith('.json'):
+            flash('请选择JSON格式的文件')
+            return redirect(request.url)
+        
+        try:
+            # 读取JSON文件
+            import_data = json.load(file)
+            
+            # 验证数据格式
+            if not isinstance(import_data, dict) or 'posts' not in import_data or 'tags' not in import_data:
+                flash('文件格式错误：缺少必要的数据字段')
+                return redirect(request.url)
+            
+            # 开始导入
+            imported_count = 0
+            
+            # 导入标签
+            tag_map = {}  # 用于映射旧ID到新ID
+            for tag_data in import_data.get('tags', []):
+                existing_tag = Tag.query.filter_by(name=tag_data['name']).first()
+                if not existing_tag:
+                    new_tag = Tag(name=tag_data['name'])
+                    db.session.add(new_tag)
+                    db.session.flush()  # 获取新ID
+                    tag_map[tag_data['id']] = new_tag.id
+                    imported_count += 1
+                else:
+                    tag_map[tag_data['id']] = existing_tag.id
+            
+            # 导入文章
+            for post_data in import_data.get('posts', []):
+                # 检查是否已存在相同slug的文章
+                existing_post = Post.query.filter_by(slug=post_data['slug']).first()
+                if existing_post:
+                    # 如果存在，跳过或更新（这里选择跳过）
+                    continue
+                
+                # 创建新文章
+                new_post = Post(
+                    title=post_data['title'],
+                    content=post_data['content'],
+                    is_page=post_data['is_page'],
+                    slug=post_data['slug']
+                )
+                
+                # 设置时间
+                try:
+                    new_post.created_at = datetime.fromisoformat(post_data['created_at'])
+                    new_post.updated_at = datetime.fromisoformat(post_data['updated_at'])
+                except:
+                    pass  # 使用默认时间
+                
+                # 添加标签
+                for tag_name in post_data.get('tags', []):
+                    tag = Tag.query.filter_by(name=tag_name).first()
+                    if tag:
+                        new_post.tags.append(tag)
+                
+                db.session.add(new_post)
+                imported_count += 1
+            
+            db.session.commit()
+            flash(f'数据导入成功！共导入 {imported_count} 条记录')
+            
+        except json.JSONDecodeError:
+            flash('文件格式错误：不是有效的JSON文件')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'导入失败：{str(e)}')
+        
+        return redirect(url_for('admin'))
+    
+    current_year = datetime.now().year
+    return render_template('admin_import.html', year=current_year)
 
 if __name__ == '__main__':
     app.run(debug=True)
