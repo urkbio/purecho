@@ -59,7 +59,7 @@ def page(slug):
     page = Post.query.filter_by(slug=slug, is_page=True).first_or_404()
     content = markdown.markdown(page.content)
     current_year = datetime.now().year
-    return render_template('page.html', title=page.title, content=content, year=current_year)
+    return render_template('post.html', title=page.title, content=content, year=current_year, post=page)
 
 @app.route('/feed.xml')
 def feed():

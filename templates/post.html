@@ -5,9 +5,9 @@
 {% block content %}
 <h1 class="page-title">{{ title }}</h1>
 <div class="post-meta">
-    <span class="post-date">发布时间：{{ post.created_at.strftime('%Y-%m-%d') }}</span>
+    <span class="post-date">发布时间：{{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
     {% if post.updated_at and post.updated_at != post.created_at %}
-    <span class="post-date">· 最后修改：{{ post.updated_at.strftime('%Y-%m-%d') }}</span>
+    <span class="post-date">· 最后修改：{{ post.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
     {% endif %}
 </div>
 <div>{{ content|safe }}</div>
