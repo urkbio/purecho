@@ -1,6 +1,9 @@
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from flask_sqlalchemy import SQLAlchemy
 from werkzeug.security import generate_password_hash, check_password_hash
+
+# 设置中国时区
+CHINA_TZ = timezone(timedelta(hours=8))
 
 db = SQLAlchemy()
 
@@ -18,8 +21,8 @@ class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(200), nullable=False)
     content = db.Column(db.Text, nullable=False)
-    created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
-    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))
+    created_at = db.Column(db.DateTime, default=lambda: datetime.now(CHINA_TZ))
+    updated_at = db.Column(db.DateTime, default=lambda: datetime.now(CHINA_TZ), onupdate=lambda: datetime.now(CHINA_TZ))
     is_page = db.Column(db.Boolean, default=False)  # 是否为独立页面
     slug = db.Column(db.String(200), unique=True)  # URL友好的标识符
 

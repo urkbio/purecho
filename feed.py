@@ -1,7 +1,10 @@
 from feedgen.feed import FeedGenerator
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from flask import url_for
 import markdown
+
+# 设置中国时区
+CHINA_TZ = timezone(timedelta(hours=8))
 
 def generate_feed(posts, config):
     fg = FeedGenerator()
@@ -17,7 +20,7 @@ def generate_feed(posts, config):
             fe.link(href=f"{config.SITE_URL}{url_for('post', slug=post.slug)}")
             fe.description(markdown.markdown(post.content))
             # 确保时间戳包含UTC时区信息
-            fe.pubDate(post.created_at.replace(tzinfo=timezone.utc) if post.created_at.tzinfo is None else post.created_at)
+            fe.pubDate(post.created_at.replace(tzinfo=CHINA_TZ) if post.created_at.tzinfo is None else post.created_at)
             fe.updated(post.updated_at.replace(tzinfo=timezone.utc) if post.updated_at.tzinfo is None else post.updated_at)
             
             # 添加标签
