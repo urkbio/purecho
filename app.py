@@ -16,6 +16,7 @@ load_dotenv()
 
 from config import Config
 from feed import generate_feed
+from sitemap import generate_sitemap
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -66,6 +67,12 @@ def feed():
     posts = Post.query.filter_by(is_page=False).order_by(Post.created_at.desc()).limit(10).all()
     feed_content = generate_feed(posts, Config())
     return Response(feed_content, mimetype='application/rss+xml')
+
+@app.route('/sitemap.xml')
+def sitemap():
+    posts = Post.query.order_by(Post.updated_at.desc()).all()
+    sitemap_content = generate_sitemap(posts, Config())
+    return Response(sitemap_content, mimetype='application/xml')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
