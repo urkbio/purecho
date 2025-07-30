@@ -53,8 +53,10 @@ def post(slug):
 @app.route('/tag/<name>')
 def tag(name):
     tag = Tag.query.filter_by(name=name).first_or_404()
+    # 获取该标签下的所有文章，按创建时间倒序排列
+    posts = Post.query.join(Post.tags).filter(Tag.name == name).order_by(Post.created_at.desc()).all()
     current_year = datetime.now().year
-    return render_template('tag.html', tag=tag, year=current_year)
+    return render_template('tag.html', tag=tag, posts=posts, year=current_year)
 
 @app.route('/page/<slug>')
 def page(slug):
