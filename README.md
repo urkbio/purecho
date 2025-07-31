@@ -1,4 +1,4 @@
-# plog
+# PurEcho
 
 非常极简的博客
 
