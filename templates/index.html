@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}Joomaen's Blog{% endblock %}
+{% block title %}{{ config.SITE_TITLE }}{% endblock %}
 
 {% block extra_head %}
     <link rel="shortcut icon" href="https://media.235421.xyz/favicon.ico" type="image/x-icon" />
@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block header %}
-<h1>Joomaen's Blog</h1>
+<h1>{{ config.SITE_TITLE }}</h1>
 {{ super() }}
 {% endblock %}
 

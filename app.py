@@ -41,14 +41,14 @@ def index(page=1):
     posts = pagination.items
     pages = Post.query.filter_by(is_page=True).all()
     current_year = datetime.now().year
-    return render_template('index.html', posts=posts, pages=pages, year=current_year, pagination=pagination)
+    return render_template('index.html', posts=posts, pages=pages, year=current_year, pagination=pagination, config=app.config)
 
 @app.route('/post/<slug>')
 def post(slug):
     post = Post.query.filter_by(slug=slug).first_or_404()
     content = markdown.markdown(post.content)
     current_year = datetime.now().year
-    return render_template('post.html', title=post.title, content=content, year=current_year, post=post)
+    return render_template('post.html', title=post.title, content=content, year=current_year, post=post, config=app.config)
 
 @app.route('/tag/<name>')
 def tag(name):
@@ -56,14 +56,14 @@ def tag(name):
     # 获取该标签下的所有文章，按创建时间倒序排列
     posts = Post.query.join(Post.tags).filter(Tag.name == name).order_by(Post.created_at.desc()).all()
     current_year = datetime.now().year
-    return render_template('tag.html', tag=tag, posts=posts, year=current_year)
+    return render_template('tag.html', tag=tag, posts=posts, year=current_year, config=app.config)
 
 @app.route('/page/<slug>')
 def page(slug):
     page = Post.query.filter_by(slug=slug, is_page=True).first_or_404()
     content = markdown.markdown(page.content)
     current_year = datetime.now().year
-    return render_template('post.html', title=page.title, content=content, year=current_year, post=page)
+    return render_template('post.html', title=page.title, content=content, year=current_year, post=page, config=app.config)
 
 @app.route('/feed.xml')
 def feed():
@@ -89,7 +89,7 @@ def login():
         flash('密码错误')
     
     current_year = datetime.now().year
-    return render_template('login.html', year=current_year)
+    return render_template('login.html', year=current_year, config=app.config)
 
 @app.route('/change-password', methods=['POST'])
 @login_required
@@ -116,7 +116,7 @@ def admin():
 @login_required
 def admin_password():
     current_year = datetime.now().year
-    return render_template('admin_password.html', year=current_year)
+    return render_template('admin_password.html', year=current_year, config=app.config)
 
 @app.route('/plog-admin/write', methods=['GET', 'POST'])
 @login_required
@@ -144,14 +144,14 @@ def admin_write():
         return redirect(url_for('admin_posts'))
     
     current_year = datetime.now().year
-    return render_template('admin_write.html', year=current_year)
+    return render_template('admin_write.html', year=current_year, config=app.config)
 
 @app.route('/plog-admin/posts')
 @login_required
 def admin_posts():
     posts = Post.query.order_by(Post.created_at.desc()).all()
     current_year = datetime.now().year
-    return render_template('admin_posts.html', posts=posts, year=current_year)
+    return render_template('admin_posts.html', posts=posts, year=current_year, config=app.config)
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit(id):
@@ -179,7 +179,7 @@ def edit(id):
         return redirect(url_for('admin'))
     
     current_year = datetime.now().year
-    return render_template('edit.html', post=post, year=current_year)
+    return render_template('edit.html', post=post, year=current_year, config=app.config)
 
 @app.route('/delete/<int:id>')
 def delete(id):
@@ -218,7 +218,7 @@ def tags():
     # 获取所有标签，按名称排序
     tags = Tag.query.order_by(Tag.name).all()
     current_year = datetime.now().year
-    return render_template('tags.html', tags=tags, year=current_year)
+    return render_template('tags.html', tags=tags, year=current_year, config=app.config)
 
 @app.route('/plog-admin/export')
 @login_required
@@ -360,7 +360,7 @@ def admin_import():
         return redirect(url_for('admin'))
     
     current_year = datetime.now().year
-    return render_template('admin_import.html', year=current_year)
+    return render_template('admin_import.html', year=current_year, config=app.config)
 
 if __name__ == '__main__':
     app.run(debug=True)

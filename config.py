@@ -9,6 +9,6 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-key-please-change-in-production'
     
     # RSS配置
-    SITE_TITLE = "Joomaen's Blog"
-    SITE_DESCRIPTION = "A simple blog powered by Flask"
+    SITE_TITLE = os.environ.get('SITE_TITLE', "PurEcho")  # 从环境变量获取博客名，默认为PurEcho
+    SITE_DESCRIPTION = os.environ.get('SITE_DESCRIPTION', "A simple blog powered by Flask")  # 从环境变量获取博客描述
     SITE_URL = os.environ.get('SITE_URL', 'http://localhost:5000')  # 从环境变量获取站点URL，默认为localhost

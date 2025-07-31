@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 
-{% block title %}{{ tag.name }} - Joomaen's Blog{% endblock %}
+{% block title %}{{ tag.name }} - {{ config.SITE_TITLE }}{% endblock %}
 
 {% block content %}
 <h1>标签：{{ tag.name }}</h1>
