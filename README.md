@@ -6,7 +6,7 @@
 
 1. 进入文件夹并创建虚拟环境
 ```
-cd plog
+cd purecho
 python3 -m venv venv 
 ```
 
