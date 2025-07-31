@@ -61,3 +61,10 @@ source venv/bin/activate
 nohup gunicorn --workers 3 -b 0.0.0.0:5000 app:app > gunicorn.log 2>&1 &
 
 ```
+
+#### 如果自己修改了模板文件的话，使用以下方式先临时保留本地改动，pull 之后再合并回去
+```
+git stash
+git pull
+git stash pop
+```
