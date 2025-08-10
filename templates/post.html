@@ -10,7 +10,7 @@
     <span class="post-date">· 最后修改：{{ post.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
     {% endif %}
 </div>
-<div>{{ content|safe }}</div>
+<div class="post-content">{{ content|safe }}</div>
 {% if not post.is_page and post.tags %}
 <div class="post-meta">
     <span class="post-tags">标签：
