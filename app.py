@@ -220,6 +220,14 @@ def tags():
     current_year = datetime.now().year
     return render_template('tags.html', tags=tags, year=current_year, config=app.config)
 
+@app.route('/api/tags')
+@login_required
+def api_tags():
+    """返回所有标签的JSON列表，用于标签自动提示"""
+    tags = Tag.query.order_by(Tag.name).all()
+    tag_list = [tag.name for tag in tags]
+    return {'tags': tag_list}
+
 @app.route('/plog-admin/export')
 @login_required
 def admin_export():

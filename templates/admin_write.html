@@ -23,7 +23,10 @@
     
     <div class="form-group" id="tags-group">
         <label for="tags">标签（用逗号分隔）：</label>
-        <input type="text" id="tags" name="tags" placeholder="标签1, 标签2">
+        <div class="tags-input-container">
+            <input type="text" id="tags" name="tags" placeholder="标签1, 标签2">
+            <div id="tags-suggestions" class="tags-suggestions"></div>
+        </div>
     </div>
     
     <div class="form-group">
@@ -38,13 +41,109 @@
 document.addEventListener('DOMContentLoaded', function() {
     const isPageCheckbox = document.querySelector('input[name="is_page"]');
     const tagsGroup = document.getElementById('tags-group');
-
+    const tagsInput = document.getElementById('tags');
+    const tagsSuggestions = document.getElementById('tags-suggestions');
+    let allTags = [];
+    
+    // 获取所有标签
+    fetch('/api/tags')
+        .then(response => response.json())
+        .then(data => {
+            allTags = data.tags;
+        })
+        .catch(error => console.error('获取标签失败:', error));
+    
+    // 处理标签输入和提示
+    tagsInput.addEventListener('input', function() {
+        const inputValue = this.value;
+        const lastTag = inputValue.split(',').pop().trim().toLowerCase();
+        
+        // 清空建议列表
+        tagsSuggestions.innerHTML = '';
+        
+        if (lastTag.length === 0) {
+            tagsSuggestions.style.display = 'none';
+            return;
+        }
+        
+        // 过滤匹配的标签
+        const matchingTags = allTags.filter(tag => 
+            tag.toLowerCase().includes(lastTag) && 
+            !inputValue.split(',').map(t => t.trim()).includes(tag)
+        );
+        
+        if (matchingTags.length === 0) {
+            tagsSuggestions.style.display = 'none';
+            return;
+        }
+        
+        // 显示匹配的标签
+        matchingTags.forEach(tag => {
+            const suggestionItem = document.createElement('div');
+            suggestionItem.className = 'suggestion-item';
+            suggestionItem.textContent = tag;
+            suggestionItem.addEventListener('click', function() {
+                // 获取当前输入值，去掉最后一个标签
+                const currentTags = inputValue.split(',').slice(0, -1).map(t => t.trim());
+                // 添加选中的标签
+                currentTags.push(tag);
+                // 更新输入框的值
+                tagsInput.value = currentTags.join(', ') + (currentTags.length > 0 ? ', ' : '');
+                // 隐藏建议列表
+                tagsSuggestions.style.display = 'none';
+                // 聚焦输入框
+                tagsInput.focus();
+            });
+            tagsSuggestions.appendChild(suggestionItem);
+        });
+        
+        tagsSuggestions.style.display = 'block';
+    });
+    
+    // 点击其他地方时隐藏建议列表
+    document.addEventListener('click', function(e) {
+        if (e.target !== tagsInput && e.target !== tagsSuggestions) {
+            tagsSuggestions.style.display = 'none';
+        }
+    });
+    
     function toggleTagsVisibility() {
         tagsGroup.style.display = isPageCheckbox.checked ? 'none' : 'block';
     }
-
+    
     isPageCheckbox.addEventListener('change', toggleTagsVisibility);
     toggleTagsVisibility(); // 初始化显示状态
 });
 </script>
+
+<style>
+.tags-input-container {
+    position: relative;
+}
+
+.tags-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border: 1px solid #ccc;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    z-index: 10;
+    display: none;
+}
+
+.suggestion-item {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.suggestion-item:hover {
+    background-color: #f5f5f5;
+}
+</style>
 {% endblock %}
