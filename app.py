@@ -48,7 +48,7 @@ def post(slug):
     post = Post.query.filter_by(slug=slug).first_or_404()
     content = markdown.markdown(
         post.content,
-        extensions=['fenced_code', 'codehilite']
+        extensions=['fenced_code', 'codehilite', 'nl2br']
     )
     current_year = datetime.now().year
     return render_template('post.html', title=post.title, content=content, year=current_year, post=post, config=app.config)
@@ -66,7 +66,7 @@ def page(slug):
     page = Post.query.filter_by(slug=slug, is_page=True).first_or_404()
     content = markdown.markdown(
         page.content,
-        extensions=['fenced_code', 'codehilite']
+        extensions=['fenced_code', 'codehilite', 'nl2br']
     )
     current_year = datetime.now().year
     return render_template('post.html', title=page.title, content=content, year=current_year, post=page, config=app.config)
