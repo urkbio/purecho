@@ -46,7 +46,10 @@ def index(page=1):
 @app.route('/post/<slug>')
 def post(slug):
     post = Post.query.filter_by(slug=slug).first_or_404()
-    content = markdown.markdown(post.content)
+    content = markdown.markdown(
+        post.content,
+        extensions=['fenced_code', 'codehilite']
+    )
     current_year = datetime.now().year
     return render_template('post.html', title=post.title, content=content, year=current_year, post=post, config=app.config)
 
@@ -61,7 +64,10 @@ def tag(name):
 @app.route('/page/<slug>')
 def page(slug):
     page = Post.query.filter_by(slug=slug, is_page=True).first_or_404()
-    content = markdown.markdown(page.content)
+    content = markdown.markdown(
+        page.content,
+        extensions=['fenced_code', 'codehilite']
+    )
     current_year = datetime.now().year
     return render_template('post.html', title=page.title, content=content, year=current_year, post=page, config=app.config)
 
