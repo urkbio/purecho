@@ -76,3 +76,8 @@ git add XXX
 git commit -m "Merge Local Code"
 
 ```
+
+#### 或者直接这样
+```
+git pull --rebase
+```
