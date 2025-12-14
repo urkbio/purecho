@@ -68,3 +68,11 @@ git stash
 git pull
 git stash pop
 ```
+到这里只是恢复回来，但是不会提交，接着执行：
+```
+git status
+git diff
+git add XXX
+git commit -m "Merge Local Code"
+
+```
