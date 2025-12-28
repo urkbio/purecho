@@ -48,7 +48,7 @@ def post(slug):
     post = Post.query.filter_by(slug=slug).first_or_404()
     content = markdown.markdown(
         post.content,
-        extensions=['fenced_code', 'codehilite', 'nl2br']
+        extensions=['fenced_code', 'nl2br']
     )
     current_year = datetime.now().year
     return render_template('post.html', title=post.title, content=content, year=current_year, post=post, config=app.config)
@@ -66,7 +66,7 @@ def page(slug):
     page = Post.query.filter_by(slug=slug, is_page=True).first_or_404()
     content = markdown.markdown(
         page.content,
-        extensions=['fenced_code', 'codehilite', 'nl2br']
+        extensions=['fenced_code', 'nl2br']
     )
     current_year = datetime.now().year
     return render_template('post.html', title=page.title, content=content, year=current_year, post=page, config=app.config)
@@ -113,18 +113,18 @@ def change_password():
     
     return redirect(url_for('admin'))
 
-@app.route('/plog-admin')
+@app.route('/admin')
 @login_required
 def admin():
     return redirect(url_for('admin_posts'))
 
-@app.route('/plog-admin/password')
+@app.route('/admin/password')
 @login_required
 def admin_password():
     current_year = datetime.now().year
     return render_template('admin_password.html', year=current_year, config=app.config)
 
-@app.route('/plog-admin/write', methods=['GET', 'POST'])
+@app.route('/admin/write', methods=['GET', 'POST'])
 @login_required
 def admin_write():
     if request.method == 'POST':
@@ -152,7 +152,7 @@ def admin_write():
     current_year = datetime.now().year
     return render_template('admin_write.html', year=current_year, config=app.config)
 
-@app.route('/plog-admin/posts')
+@app.route('/admin/posts')
 @login_required
 def admin_posts():
     posts = Post.query.order_by(Post.created_at.desc()).all()
@@ -234,7 +234,7 @@ def api_tags():
     tag_list = [tag.name for tag in tags]
     return {'tags': tag_list}
 
-@app.route('/plog-admin/export')
+@app.route('/admin/export')
 @login_required
 def admin_export():
     """导出所有数据为JSON文件"""
@@ -274,7 +274,7 @@ def admin_export():
             export_data['posts'].append(post_data)
         
         # 创建临时文件到backups文件夹
-        export_filename = f'plog_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+        export_filename = f'backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
         export_path = os.path.join(os.getcwd(), 'backups', export_filename)
         
         with open(export_path, 'w', encoding='utf-8') as f:
@@ -287,7 +287,7 @@ def admin_export():
         flash(f'导出失败：{str(e)}')
         return redirect(url_for('admin'))
 
-@app.route('/plog-admin/import', methods=['GET', 'POST'])
+@app.route('/admin/import', methods=['GET', 'POST'])
 @login_required
 def admin_import():
     """导入JSON数据文件"""

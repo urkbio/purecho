@@ -18,10 +18,10 @@ __pycache__/
 Thumbs.db
 
 # SQLite 数据库文件
+blog.db
 
 # 环境变量文件
 .env
-blog.db
 
 # 忽略日志文件
 *.log
@@ -29,3 +29,6 @@ blog.db
 # 忽略备份文件
 backups/
 *.json
+
+#忽略cookie
+cookies.txt

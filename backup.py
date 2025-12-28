@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Plog 数据备份工具
+PurEcho 数据备份工具
 支持导出和导入所有博客数据
 """
 
@@ -56,7 +56,7 @@ def export_data(output_file=None):
             
             # 生成文件名到backups文件夹
             if not output_file:
-                output_file = f'plog_backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
+                output_file = f'backup_{datetime.now().strftime("%Y%m%d_%H%M%S")}.json'
             
             # 确保backups文件夹存在
             backups_dir = os.path.join(os.getcwd(), 'backups')
@@ -180,7 +180,7 @@ def import_data(input_file, force=False):
     return True
 
 def main():
-    parser = argparse.ArgumentParser(description='Plog 数据备份工具')
+    parser = argparse.ArgumentParser(description='PurEcho 数据备份工具')
     parser.add_argument('action', choices=['export', 'import'], help='操作类型')
     parser.add_argument('file', nargs='?', help='文件路径')
     parser.add_argument('--force', '-f', action='store_true', help='强制导入（跳过确认）')

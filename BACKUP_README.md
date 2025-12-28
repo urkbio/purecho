@@ -1,8 +1,8 @@
-# Plog 数据备份功能使用说明
+# PurEcho 数据备份功能使用说明
 
 ## 功能概述
 
-Plog 提供了完整的数据备份和恢复功能，支持导出和导入所有博客数据，包括：
+PurEcho 提供了完整的数据备份和恢复功能，支持导出和导入所有博客数据，包括：
 - 文章标题、内容、创建时间、更新时间
 - 标签信息
 - 独立页面设置
@@ -12,10 +12,10 @@ Plog 提供了完整的数据备份和恢复功能，支持导出和导入所有
 
 所有备份文件默认保存在项目根目录的 `backups/` 文件夹中：
 ```
-plog/
+purecho/
 ├── backups/                    # 备份文件目录
-│   ├── plog_backup_20250720_180441.json
-│   └── plog_backup_20250720_175506.json
+│   ├── backup_20250720_180441.json
+│   └── backup_20250720_175506.json
 ├── app.py
 ├── backup.py
 └── ...
@@ -26,14 +26,14 @@ plog/
 ### 1. 网页界面备份（推荐）
 
 #### 导出数据
-1. 登录管理后台：`http://localhost:5001/plog-admin`
+1. 登录管理后台：`http://localhost:5001/admin`
 2. 点击左侧菜单的"导出数据"
 3. 系统会自动下载一个 JSON 格式的备份文件
-4. 文件名格式：`plog_backup_YYYYMMDD_HHMMSS.json`
+4. 文件名格式：`backup_YYYYMMDD_HHMMSS.json`
 5. 文件会自动保存到 `backups/` 文件夹
 
 #### 导入数据
-1. 登录管理后台：`http://localhost:5001/plog-admin`
+1. 登录管理后台：`http://localhost:5001/admin`
 2. 点击左侧菜单的"导入数据"
 3. 选择之前导出的 JSON 备份文件
 4. 点击"开始导入"
@@ -59,13 +59,13 @@ python backup.py export my_backup.json
 source venv/bin/activate
 
 # 导入数据（从backups/文件夹查找）
-python backup.py import plog_backup_20250720_180441.json
+python backup.py import backup_20250720_180441.json
 
 # 导入数据（指定完整路径）
 python backup.py import /path/to/backup.json
 
 # 强制导入（跳过确认）
-python backup.py import plog_backup_20250720_180441.json --force
+python backup.py import backup_20250720_180441.json --force
 ```
 
 ## 备份文件格式
@@ -115,8 +115,8 @@ python backup.py import plog_backup_20250720_180441.json --force
 ## 文件管理
 
 ### 备份文件命名规则
-- 格式：`plog_backup_YYYYMMDD_HHMMSS.json`
-- 示例：`plog_backup_20250720_180441.json`
+- 格式：`backup_YYYYMMDD_HHMMSS.json`
+- 示例：`backup_20250720_180441.json`
 
 ### 自动创建目录
 - 系统会自动创建 `backups/` 文件夹
