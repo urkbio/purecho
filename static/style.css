@@ -27,6 +27,14 @@ body {
     background-color: var(--bg-color);
 }
 
+pre {
+    background-color: #fffbe6;
+    font-family: monospace;
+    padding: 16px;
+    border-radius: 4px;
+    overflow-x: auto;
+}
+
 /* Responsive container */
 .container {
     width: 100%;
