@@ -18,13 +18,29 @@ def generate_feed(posts, config):
             fe = fg.add_entry()
             fe.title(post.title)
             fe.link(href=f"{config.SITE_URL}{url_for('post', slug=post.slug)}")
-            fe.description(markdown.markdown(post.content))
-            # 确保时间戳包含UTC时区信息
-            fe.pubDate(post.created_at.replace(tzinfo=CHINA_TZ) if post.created_at.tzinfo is None else post.created_at)
-            fe.updated(post.updated_at.replace(tzinfo=timezone.utc) if post.updated_at.tzinfo is None else post.updated_at)
-            
+
+            # 处理 markdown（支持 ``` 代码块）
+            html = markdown.markdown(
+                post.content,
+                extensions=["fenced_code", "codehilite"]
+            )
+
+            # 使用 content:encoded，保证代码块正常显示
+            fe.content(html, type='CDATA')
+
+            fe.pubDate(
+                post.created_at.replace(tzinfo=CHINA_TZ)
+                if post.created_at.tzinfo is None
+                else post.created_at
+            )
+            fe.updated(
+                post.updated_at.replace(tzinfo=timezone.utc)
+                if post.updated_at.tzinfo is None
+                else post.updated_at
+            )
+
             # 添加标签
             for tag in post.tags:
                 fe.category(term=tag.name)
-    
+
     return fg.rss_str(pretty=True)
