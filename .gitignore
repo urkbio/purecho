@@ -32,3 +32,6 @@ backups/
 
 #忽略cookie
 cookies.txt
+
+#忽略自定义代码
+templates/_local_*.html

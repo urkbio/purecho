@@ -62,22 +62,5 @@ nohup gunicorn --workers 3 -b 0.0.0.0:5000 app:app > gunicorn.log 2>&1 &
 
 ```
 
-#### 如果自己修改了模板文件的话，使用以下方式先临时保留本地改动，pull 之后再合并回去
-```
-git stash
-git pull
-git stash pop
-```
-到这里只是恢复回来，但是不会提交，接着执行：
-```
-git status
-git diff
-git add XXX
-git commit -m "Merge Local Code"
-
-```
-
-#### 或者直接这样
-```
-git pull --rebase
-```
+### 自定义代码
+写在 `templates/_local_*.html` 比如统计代码、广告、字体...

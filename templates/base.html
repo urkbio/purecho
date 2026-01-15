@@ -6,7 +6,9 @@
     <title>{% block title %}{% endblock %}</title>
     <link rel="shortcut icon" href="{{ config.FAVICON_URL }}" type="image/x-icon" />
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    {% block extra_head %}{% endblock %}
+    {% block extra_head %}
+      {% include "_local_head.html" ignore missing %}
+    {% endblock %}
 </head>
 <body>
 {% block header %}
