@@ -155,9 +155,22 @@ def admin_write():
 @app.route('/admin/posts')
 @login_required
 def admin_posts():
-    posts = Post.query.order_by(Post.created_at.desc()).all()
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    pagination = Post.query.filter_by(is_page=False).order_by(Post.updated_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    posts = pagination.items
     current_year = datetime.now().year
-    return render_template('admin_posts.html', posts=posts, year=current_year, config=app.config)
+    return render_template('admin_posts.html', posts=posts, pagination=pagination, view_type='posts', year=current_year, config=app.config)
+
+@app.route('/admin/pages')
+@login_required
+def admin_pages():
+    page = request.args.get('page', 1, type=int)
+    per_page = 10
+    pagination = Post.query.filter_by(is_page=True).order_by(Post.updated_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+    pages = pagination.items
+    current_year = datetime.now().year
+    return render_template('admin_posts.html', posts=pages, pagination=pagination, view_type='pages', year=current_year, config=app.config)
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
 def edit(id):
