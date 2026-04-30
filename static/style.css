@@ -439,6 +439,19 @@ footer {
     color: var(--light-text);
 }
 
+.post-content p {
+    /* 正常的段落间距，建议 1.5 到 1.8 个字符高度 */
+    margin-bottom: 1.6em; 
+}
+
+.post-content br {
+    display: block;
+    /* 设置为 0.8em 到 1em，这样你额外加的一个回车，*/
+    /* 看起来正好就是一个标准行高。 */
+    margin-top: 0.8em; 
+    content: "";
+}
+
 /* Responsive images and media */
 img, video, iframe {
     max-width: 100%;
