@@ -459,6 +459,19 @@ footer {
     margin-bottom: 2em;
 }
 
+/* 以下两条定义表格样式 */
+.post-content table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 1.5em 0;
+}
+
+.post-content th, .post-content td {
+    /* 仅仅设置线条，不设背景 */
+    border: 1px solid #eee; 
+    padding: 12px;
+}
+
 /* Responsive images and media */
 img, video, iframe {
     max-width: 100%;
