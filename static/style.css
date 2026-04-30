@@ -452,6 +452,13 @@ footer {
     content: "";
 }
 
+/* 针对 Markdown 分割线的样式修复 */
+.post-content hr {
+    /* 设置上下对称的间距，建议和段落间距 (p) 保持一致 */
+    margin-top: 2em;
+    margin-bottom: 2em;
+}
+
 /* Responsive images and media */
 img, video, iframe {
     max-width: 100%;
