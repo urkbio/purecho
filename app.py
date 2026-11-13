@@ -200,7 +200,8 @@ def edit(id):
     current_year = datetime.now().year
     return render_template('edit.html', post=post, year=current_year, config=app.config)
 
-@app.route('/delete/<int:id>')
+@app.route('/delete/<int:id>', methods=['POST'])
+@login_required
 def delete(id):
     post = Post.query.get_or_404(id)
     db.session.delete(post)
