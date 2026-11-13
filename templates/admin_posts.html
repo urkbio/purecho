@@ -23,8 +23,8 @@
         </div>
         <div class="actions">
             <a href="{{ url_for('edit', id=post.id) }}" class="button">编辑</a>
-            <form method="post" action="{{ url_for('delete', id=post.id) }}" style="display: inline;" onsubmit="return confirm('确定要删除吗？')">
-                <button type="submit" class="button delete">删除</button>
+            <form method="post" action="{{ url_for('delete', id=post.id) }}" onsubmit="return confirm('确定要删除吗？')">
+                <button type="submit" class="link-button">删除</button>
             </form>
         </div>
     </div>

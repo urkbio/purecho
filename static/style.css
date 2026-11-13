@@ -305,6 +305,29 @@ button:active {
     transform: translateY(1px);
 }
 
+.link-button {
+    background: none;
+    border: none;
+    padding: 0;
+    width: auto;
+    color: var(--primary-color);
+    font: inherit;
+    cursor: pointer;
+}
+
+.link-button:hover {
+    background: none;
+    color: var(--primary-hover);
+}
+
+.link-button:active {
+    transform: none;
+}
+
+.actions form {
+    display: inline;
+}
+
 @media (max-width: 576px) {
     button {
         width: 100%;
