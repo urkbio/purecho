@@ -1,3 +1,5 @@
+import os
+
 from app import app, db, AdminPassword
 
 def init_database():
@@ -19,4 +21,5 @@ def init_database():
 if __name__ == '__main__':
     print('开始初始化数据库...')
     init_database()
+    os.makedirs('backups', exist_ok=True)
     print('数据库初始化完成！')
