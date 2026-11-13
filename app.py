@@ -97,6 +97,11 @@ def login():
     current_year = datetime.now().year
     return render_template('login.html', year=current_year, config=app.config)
 
+@app.route('/logout', methods=['POST'])
+def logout():
+    session.pop('logged_in', None)
+    return redirect(url_for('login'))
+
 @app.route('/change-password', methods=['POST'])
 @login_required
 def change_password():
