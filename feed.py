@@ -2,9 +2,34 @@ from feedgen.feed import FeedGenerator
 from datetime import datetime, timezone, timedelta
 from flask import url_for
 import markdown
+import nh3
 
 # 设置中国时区
 CHINA_TZ = timezone(timedelta(hours=8))
+
+def render_markdown(text):
+    html = markdown.markdown(
+        text,
+        extensions=['fenced_code', 'nl2br', 'tables']
+    )
+
+    return nh3.clean(
+        html,
+        tags={
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'p', 'br', 'hr', 'blockquote',
+            'strong', 'em', 'del',
+            'ul', 'ol', 'li',
+            'pre', 'code',
+            'table', 'thead', 'tbody', 'tr', 'th', 'td',
+            'a', 'img'
+        },
+        attributes={
+            'a': {'href', 'title'},
+            'img': {'src', 'alt', 'title'}
+        },
+        url_schemes={'http', 'https', 'mailto'}
+    )
 
 def generate_feed(posts, config):
     fg = FeedGenerator()
@@ -20,10 +45,7 @@ def generate_feed(posts, config):
             fe.link(href=f"{config.SITE_URL}{url_for('post', slug=post.slug)}")
 
             # 处理 markdown（支持 ``` 代码块）
-            html = markdown.markdown(
-                post.content,
-                extensions=["fenced_code", "codehilite"]
-            )
+            html = render_markdown(post.content)
 
             # 使用 content:encoded，保证代码块正常显示
             fe.content(html, type='CDATA')

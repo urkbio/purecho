@@ -2,6 +2,7 @@
 import os
 import markdown
 import json
+import nh3
 from datetime import datetime
 from functools import wraps
 
@@ -33,6 +34,30 @@ def login_required(f):
         return f(*args, **kwargs)
     return decorated_function
 
+def render_markdown(text):
+    html = markdown.markdown(
+        text,
+        extensions=['fenced_code', 'nl2br', 'tables']
+    )
+
+    return nh3.clean(
+        html,
+        tags={
+            'h1', 'h2', 'h3', 'h4', 'h5', 'h6',
+            'p', 'br', 'hr', 'blockquote',
+            'strong', 'em', 'del',
+            'ul', 'ol', 'li',
+            'pre', 'code',
+            'table', 'thead', 'tbody', 'tr', 'th', 'td',
+            'a', 'img'
+        },
+        attributes={
+            'a': {'href', 'title'},
+            'img': {'src', 'alt', 'title'}
+        },
+        url_schemes={'http', 'https', 'mailto'}
+    )
+
 @app.route('/')
 @app.route('/page/<int:page>')
 def index(page=1):
@@ -46,10 +71,7 @@ def index(page=1):
 @app.route('/post/<slug>')
 def post(slug):
     post = Post.query.filter_by(slug=slug).first_or_404()
-    content = markdown.markdown(
-        post.content,
-        extensions=['fenced_code', 'nl2br', 'tables', 'abbr']
-    )
+    content = render_markdown(post.content)
     current_year = datetime.now().year
     return render_template('post.html', title=post.title, content=content, year=current_year, post=post, config=app.config)
 
@@ -64,10 +86,7 @@ def tag(name):
 @app.route('/page/<slug>')
 def page(slug):
     page = Post.query.filter_by(slug=slug, is_page=True).first_or_404()
-    content = markdown.markdown(
-        page.content,
-        extensions=['fenced_code', 'nl2br', 'tables', 'abbr']
-    )
+    content = render_markdown(page.content)
     current_year = datetime.now().year
     return render_template('post.html', title=page.title, content=content, year=current_year, post=page, config=app.config)
 
@@ -178,6 +197,7 @@ def admin_pages():
     return render_template('admin_posts.html', posts=pages, pagination=pagination, view_type='pages', year=current_year, config=app.config)
 
 @app.route('/edit/<int:id>', methods=['GET', 'POST'])
+@login_required
 def edit(id):
     post = Post.query.get_or_404(id)
     if request.method == 'POST':
