@@ -64,15 +64,18 @@ def render_markdown(text):
         url_schemes={'http', 'https', 'mailto'}
     )
 
+@app.context_processor
+def inject_navigation_pages():
+    return {'pages': Post.query.filter_by(is_page=True).all()}
+
 @app.route('/')
-@app.route('/page/<int:page>')
-def index(page=1):
-    per_page = 10
+def index():
+    page = max(request.args.get('page', 1, type=int), 1)
+    per_page = 16
     pagination = Post.query.filter_by(is_page=False).order_by(Post.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
     posts = pagination.items
-    pages = Post.query.filter_by(is_page=True).all()
     current_year = datetime.now().year
-    return render_template('index.html', posts=posts, pages=pages, year=current_year, pagination=pagination, config=app.config)
+    return render_template('index.html', posts=posts, year=current_year, pagination=pagination, config=app.config)
 
 @app.route('/post/<slug>')
 def post(slug):

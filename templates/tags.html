@@ -4,13 +4,11 @@
 
 {% block content %}
 <div class="tags-page">
-    <h1>标签云</h1>
-    
     {% if tags %}
         <div class="tags-cloud">
             {% for tag in tags %}
                 <div class="tag-item">
-                    <a href="{{ url_for('tag', name=tag.name) }}" class="tag-link">
+                    <a href="{{ url_for('tag', name=tag.name) }}" class="nav-item tag-link">
                         <span class="tag-name">{{ tag.name }}</span>
                         <span class="tag-count">{{ tag.posts.count() }}</span>
                     </a>
@@ -49,26 +47,9 @@
     margin-bottom: 30px;
 }
 
-.tag-item {
-    background: #f8f9fa;
-    border: 1px solid #e9ecef;
-    border-radius: 20px;
-    transition: all 0.3s ease;
-}
-
-.tag-item:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    border-color: #007bff;
-}
-
 .tag-link {
     display: flex;
     align-items: center;
-    padding: 8px 16px;
-    text-decoration: none;
-    color: #333;
-    font-size: 14px;
 }
 
 .tag-name {
@@ -77,14 +58,8 @@
 }
 
 .tag-count {
-    background: #007bff;
-    color: white;
-    border-radius: 10px;
-    padding: 2px 8px;
+    color: var(--light-text);
     font-size: 12px;
-    font-weight: bold;
-    min-width: 20px;
-    text-align: center;
 }
 
 .tags-stats {
@@ -103,11 +78,6 @@
 @media (max-width: 600px) {
     .tags-cloud {
         gap: 10px;
-    }
-    
-    .tag-link {
-        padding: 6px 12px;
-        font-size: 13px;
     }
 }
 </style>
