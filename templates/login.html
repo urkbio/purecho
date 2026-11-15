@@ -16,6 +16,7 @@
             {% endif %}
         {% endwith %}
         <form method="post" class="login-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
             <div class="form-group">
                 <label for="password">密码：</label>
                 <input type="password" id="password" name="password" required>

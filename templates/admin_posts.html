@@ -24,6 +24,7 @@
         <div class="actions">
             <a href="{{ url_for('edit', id=post.id) }}" class="button">编辑</a>
             <form method="post" action="{{ url_for('delete', id=post.id) }}" onsubmit="return confirm('确定要删除吗？')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="link-button">删除</button>
             </form>
         </div>

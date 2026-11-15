@@ -9,6 +9,8 @@ from functools import wraps
 # 第三方库
 from flask import Flask, render_template, request, redirect, url_for, Response, session, flash, send_file
 from dotenv import load_dotenv
+from flask_wtf.csrf import CSRFProtect
+
 
 # 本地应用模块
 from models import db, Post, Tag, AdminPassword
@@ -24,6 +26,9 @@ app = Flask(__name__)
 app.config.from_object(Config)
 # 使用配置文件中的SECRET_KEY
 app.secret_key = app.config['SECRET_KEY']
+# 启用 CSRF 全局保护
+csrf = CSRFProtect(app)
+
 db.init_app(app)
 
 def login_required(f):

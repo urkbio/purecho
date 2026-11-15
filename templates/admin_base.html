@@ -139,6 +139,7 @@
                 <li><a href="{{ url_for('admin_import') }}" {% if request.endpoint == 'admin_import' %}class="active"{% endif %}>导入数据</a></li>
             </ul>
             <form method="post" action="{{ url_for('logout') }}" class="logout-form">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="logout-button">登出</button>
             </form>
         </nav>

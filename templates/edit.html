@@ -5,6 +5,7 @@
 {% block content %}
 <h1>编辑文章</h1>
 <form method="post">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
     <div class="form-group">
         <label for="title">标题：</label>
         <input type="text" id="title" name="title" value="{{ post.title }}" required>
