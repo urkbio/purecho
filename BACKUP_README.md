@@ -18,6 +18,7 @@ purecho/
 │   └── backup_20250720_175506.json
 ├── app.py
 ├── backup.py
+├── data_manager.py            # 统一的导入导出核心逻辑
 └── ...
 ```
 
@@ -26,14 +27,14 @@ purecho/
 ### 1. 网页界面备份（推荐）
 
 #### 导出数据
-1. 登录管理后台：`http://localhost:5001/admin`
+1. 登录管理后台：`http://localhost:5000/admin`
 2. 点击左侧菜单的"导出数据"
 3. 系统会自动下载一个 JSON 格式的备份文件
 4. 文件名格式：`backup_YYYYMMDD_HHMMSS.json`
 5. 文件会自动保存到 `backups/` 文件夹
 
 #### 导入数据
-1. 登录管理后台：`http://localhost:5001/admin`
+1. 登录管理后台：`http://localhost:5000/admin`
 2. 点击左侧菜单的"导入数据"
 3. 选择之前导出的 JSON 备份文件
 4. 点击"开始导入"
@@ -43,7 +44,10 @@ purecho/
 
 #### 导出数据
 ```bash
-# 激活虚拟环境
+# 激活虚拟环境（Windows PowerShell）
+.\venv\Scripts\Activate.ps1
+
+# 激活虚拟环境（Linux / macOS）
 source venv/bin/activate
 
 # 导出数据（自动生成文件名，保存到backups/）
@@ -55,7 +59,10 @@ python backup.py export my_backup.json
 
 #### 导入数据
 ```bash
-# 激活虚拟环境
+# 激活虚拟环境（Windows PowerShell）
+.\venv\Scripts\Activate.ps1
+
+# 激活虚拟环境（Linux / macOS）
 source venv/bin/activate
 
 # 导入数据（从backups/文件夹查找）
@@ -103,7 +110,7 @@ python backup.py import backup_20250720_180441.json --force
 - **重复检测**：基于文章 slug 检测重复，自动跳过已存在的文章
 - **标签去重**：自动检测重复标签，不会重复创建
 - **事务保护**：导入过程中如果出错，会自动回滚，不会破坏现有数据
-- **数据验证**：验证备份文件格式，确保数据完整性
+- **数据验证**：检查备份文件是否包含 `posts` 和 `tags` 必要数据字段
 - **智能路径**：导入时自动在 `backups/` 文件夹中查找文件
 
 ### 建议的备份策略
@@ -139,7 +146,7 @@ A: 目前支持完整备份，如果需要部分备份，可以手动编辑 JSON
 A: 检查备份文件是否完整，确保是有效的 JSON 格式。如果仍有问题，可以查看错误日志。
 
 ### Q: 可以跨版本导入吗？
-A: 支持跨版本导入，系统会自动处理数据格式差异。
+A: 跨版本导入前需确认备份文件的字段结构与当前格式兼容，系统不会自动转换不同版本的数据格式。
 
 ### Q: 如何找到备份文件？
 A: 所有备份文件都保存在项目根目录的 `backups/` 文件夹中。
@@ -160,4 +167,3 @@ A: 所有备份文件都保存在项目根目录的 `backups/` 文件夹中。
 2. 检查备份文件格式
 3. 确认数据库连接正常
 4. 检查 `backups/` 文件夹权限
-5. 联系技术支持 
