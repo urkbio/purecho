@@ -10,11 +10,13 @@ from functools import wraps
 from flask import Flask, render_template, request, redirect, url_for, Response, session, flash, send_file
 from dotenv import load_dotenv
 from flask_wtf.csrf import CSRFProtect
+from flask_sqlalchemy.pagination import Pagination
 
 
 # 本地应用模块
 from models import db, Post, Tag, AdminPassword
 from services.data_manager import export_data, import_data, load_backup
+from services.search import search_posts
 
 # 加载环境变量
 load_dotenv()
@@ -31,6 +33,28 @@ app.secret_key = app.config['SECRET_KEY']
 csrf = CSRFProtect(app)
 
 db.init_app(app)
+
+
+class SearchPagination(Pagination):
+    """为内存搜索结果提供与 ORM 分页一致的接口。"""
+
+    def __init__(self, items, **kwargs):
+        self._all_items = items
+        super().__init__(**kwargs)
+
+    def _query_items(self):
+        start = (self.page - 1) * self.per_page
+        return self._all_items[start:start + self.per_page]
+
+    def _query_count(self):
+        return len(self._all_items)
+
+
+def _search_pagination(query, page, per_page, order_by):
+    posts = Post.query.filter_by(is_page=False).order_by(order_by).all()
+    results = search_posts(posts, query)
+    return SearchPagination(results, page=page, per_page=per_page, error_out=False)
+
 
 def login_required(f):
     @wraps(f)
@@ -72,10 +96,22 @@ def inject_navigation_pages():
 def index():
     page = max(request.args.get('page', 1, type=int), 1)
     per_page = 16
-    pagination = Post.query.filter_by(is_page=False).order_by(Post.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    posts = pagination.items
+    query = request.args.get('q', '').strip()
+
+    if query:
+        pagination = _search_pagination(query, page, per_page, Post.created_at.desc())
+        search_results = pagination.items
+        posts = [result['post'] for result in search_results]
+    else:
+        pagination = Post.query.filter_by(is_page=False).order_by(Post.created_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        posts = pagination.items
+        search_results = []
+
     current_year = datetime.now().year
-    return render_template('index.html', posts=posts, year=current_year, pagination=pagination, config=app.config)
+    return render_template(
+        'index.html', posts=posts, year=current_year, pagination=pagination,
+        config=app.config, query=query, search_results=search_results
+    )
 
 @app.route('/post/<slug>')
 def post(slug):
@@ -190,10 +226,23 @@ def admin_write():
 def admin_posts():
     page = request.args.get('page', 1, type=int)
     per_page = 10
-    pagination = Post.query.filter_by(is_page=False).order_by(Post.updated_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
-    posts = pagination.items
+    query = request.args.get('q', '').strip()
+
+    if query:
+        pagination = _search_pagination(query, page, per_page, Post.updated_at.desc())
+        search_results = pagination.items
+        posts = [result['post'] for result in search_results]
+    else:
+        pagination = Post.query.filter_by(is_page=False).order_by(Post.updated_at.desc()).paginate(page=page, per_page=per_page, error_out=False)
+        posts = pagination.items
+        search_results = []
+
     current_year = datetime.now().year
-    return render_template('admin_posts.html', posts=posts, pagination=pagination, view_type='posts', year=current_year, config=app.config)
+    return render_template(
+        'admin_posts.html', posts=posts, pagination=pagination,
+        view_type='posts', year=current_year, config=app.config,
+        query=query, search_results=search_results
+    )
 
 @app.route('/admin/pages')
 @login_required

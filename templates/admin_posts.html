@@ -3,11 +3,25 @@
 {% block title %}{% if view_type == 'pages' %}管理页面 - 管理后台{% else %}管理文章 - 管理后台{% endif %}{% endblock %}
 
 {% block admin_content %}
+{% set query = query|default('') %}
 <h2>{% if view_type == 'pages' %}已发布的页面{% else %}已发布的文章{% endif %}</h2>
+{% if view_type != 'pages' %}
+<form method="get" action="{{ url_for('admin_posts') }}" class="search-form" role="search">
+    <input type="search" name="q" value="{{ query }}" placeholder="搜索文章标题或正文" aria-label="搜索文章">
+    <button type="submit">搜索</button>
+    {% if query %}<a href="{{ url_for('admin_posts') }}" class="search-reset">清除</a>{% endif %}
+</form>
+{% if query %}<p class="search-summary">搜索“{{ query }}”，共找到 {{ pagination.total }} 篇文章。</p>{% endif %}
+{% endif %}
+
 <div class="posts-admin">
     {% for post in posts %}
+    {% set result = search_results[loop.index0] if query else none %}
     <div class="post-item">
-        <h3>{{ post.title }}</h3>
+        <h3>{% if result %}{% for segment, matched in result.title_segments %}{% if matched %}<mark>{{ segment }}</mark>{% else %}{{ segment }}{% endif %}{% endfor %}{% else %}{{ post.title }}{% endif %}</h3>
+        {% if result and result.excerpt_segments %}
+        <p class="search-excerpt">{% for segment, matched in result.excerpt_segments %}{% if matched %}<mark>{{ segment }}</mark>{% else %}{{ segment }}{% endif %}{% endfor %}</p>
+        {% endif %}
         <div class="post-meta-line">
             <span>发布时间：{{ post.created_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
             <span>最后编辑：{{ post.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
@@ -38,7 +52,7 @@
     {% if view_type == 'pages' %}
       <a href="{{ url_for('admin_pages', page=pagination.prev_num) }}" class="nav-item">&laquo; 上一页</a>
     {% else %}
-      <a href="{{ url_for('admin_posts', page=pagination.prev_num) }}" class="nav-item">&laquo; 上一页</a>
+      <a href="{{ url_for('admin_posts', page=pagination.prev_num, q=query or none) }}" class="nav-item">&laquo; 上一页</a>
     {% endif %}
   {% endif %}
   
@@ -48,7 +62,7 @@
         {% if view_type == 'pages' %}
           <a href="{{ url_for('admin_pages', page=page) }}" class="nav-item">{{ page }}</a>
         {% else %}
-          <a href="{{ url_for('admin_posts', page=page) }}" class="nav-item">{{ page }}</a>
+          <a href="{{ url_for('admin_posts', page=page, q=query or none) }}" class="nav-item">{{ page }}</a>
         {% endif %}
       {% else %}
         <span class="nav-item pagination-current">{{ page }}</span>
@@ -62,7 +76,7 @@
     {% if view_type == 'pages' %}
       <a href="{{ url_for('admin_pages', page=pagination.next_num) }}" class="nav-item">下一页 &raquo;</a>
     {% else %}
-      <a href="{{ url_for('admin_posts', page=pagination.next_num) }}" class="nav-item">下一页 &raquo;</a>
+      <a href="{{ url_for('admin_posts', page=pagination.next_num, q=query or none) }}" class="nav-item">下一页 &raquo;</a>
     {% endif %}
   {% endif %}
 </div>

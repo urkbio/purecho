@@ -288,7 +288,7 @@ ul, li {
     font-size: 1.08em;  /* 放大字体 */
 }
 
-textarea, input[type="text"], input[type="password"] {
+textarea, input[type="text"], input[type="password"], input[type="search"] {
     width: 100%;
     font-family: monospace;
     padding: 0.8em;
@@ -299,17 +299,60 @@ textarea, input[type="text"], input[type="password"] {
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-textarea:focus, input[type="text"]:focus, input[type="password"]:focus {
+textarea:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus {
     outline: none;
     border-color: var(--primary-color);
     box-shadow: 0 0 0 2px rgba(0, 122, 204, 0.2);
 }
 
 @media (max-width: 576px) {
-    textarea, input[type="text"], input[type="password"] {
+    textarea, input[type="text"], input[type="password"], input[type="search"] {
         padding: 0.6em;
         font-size: 16px; /* Prevents zoom on mobile */
     }
+}
+
+.search-form {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-bottom: 1em;
+}
+
+.search-form input {
+    flex: 1 1 240px;
+    min-width: 0;
+    margin-bottom: 0;
+}
+
+.search-form button {
+    width: auto;
+    flex-shrink: 0;
+}
+
+.search-reset {
+    flex-shrink: 0;
+}
+
+.search-summary {
+    margin-bottom: 1em;
+    color: var(--light-text);
+    font-size: 0.9em;
+}
+
+.search-excerpt {
+    margin-top: 0.5em;
+    color: var(--light-text);
+    font-size: 0.9em;
+    line-height: 1.6;
+}
+
+mark {
+    padding: 0 0.08em;
+    border-radius: 2px;
+    background-color: #fff1a8;
+    color: #333;
 }
 
 button {
