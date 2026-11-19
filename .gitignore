@@ -30,7 +30,7 @@ blog.db
 backups/
 *.json
 
-#忽略cookie
+#忽略 cookie
 cookies.txt
 
 #忽略自定义代码
