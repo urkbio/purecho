@@ -1,6 +1,5 @@
 # 标准库
 import os
-import markdown
 import json
 import nh3
 from datetime import datetime
@@ -16,6 +15,7 @@ from flask_sqlalchemy.pagination import Pagination
 # 本地应用模块
 from models import db, Post, Tag, AdminPassword
 from services.data_manager import export_data, import_data, load_backup
+from services.markdown import render_html
 from services.search import search_posts
 
 # 加载环境变量
@@ -65,10 +65,7 @@ def login_required(f):
     return decorated_function
 
 def render_markdown(text):
-    html = markdown.markdown(
-        text,
-        extensions=['fenced_code', 'nl2br', 'tables']
-    )
+    html = render_html(text)
 
     return nh3.clean(
         html,

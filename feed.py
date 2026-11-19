@@ -1,17 +1,15 @@
 from feedgen.feed import FeedGenerator
 from datetime import datetime, timezone, timedelta
 from flask import url_for
-import markdown
 import nh3
+
+from services.markdown import render_html
 
 # 设置中国时区
 CHINA_TZ = timezone(timedelta(hours=8))
 
 def render_markdown(text):
-    html = markdown.markdown(
-        text,
-        extensions=['fenced_code', 'nl2br', 'tables']
-    )
+    html = render_html(text)
 
     return nh3.clean(
         html,

@@ -18,7 +18,9 @@ purecho/
 │   └── backup_20250720_175506.json
 ├── app.py
 ├── backup.py
-├── data_manager.py            # 统一的导入导出核心逻辑
+├── services/
+│   ├── data_manager.py          # 统一的导入导出核心逻辑
+│   ├── search.py                # 搜索功能相关逻辑
 └── ...
 ```
 
@@ -85,7 +87,6 @@ python backup.py import backup_20250720_180441.json --force
   "exported_at": "2025-07-20T18:04:41.123456",
   "posts": [
     {
-      "id": 1,
       "title": "文章标题",
       "content": "文章内容（Markdown格式）",
       "created_at": "2025-07-20T17:47:56.174096",
@@ -97,7 +98,6 @@ python backup.py import backup_20250720_180441.json --force
   ],
   "tags": [
     {
-      "id": 1,
       "name": "标签名称"
     }
   ]

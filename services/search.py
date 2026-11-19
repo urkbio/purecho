@@ -1,8 +1,9 @@
 import re
 from html import unescape
 
-import markdown
 import nh3
+
+from services.markdown import render_html
 
 TITLE_WEIGHT = 0.7
 CONTENT_WEIGHT = 0.3
@@ -16,10 +17,7 @@ def _compile_query(query):
 
 
 def _plain_text(content):
-    html = markdown.markdown(
-        content,
-        extensions=['fenced_code', 'nl2br', 'tables']
-    )
+    html = render_html(content)
     text = nh3.clean(html, tags=set())
     return ' '.join(unescape(text).split())
 
