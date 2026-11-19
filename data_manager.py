@@ -48,13 +48,11 @@ def export_data(output_file=None):
 
     for tag in tags:
         export_data['tags'].append({
-            'id': tag.id,
             'name': tag.name
         })
 
     for post in posts:
         export_data['posts'].append({
-            'id': post.id,
             'title': post.title,
             'content': post.content,
             'created_at': post.created_at.isoformat(),
@@ -82,17 +80,13 @@ def import_data(data):
     imported_count = 0
 
     try:
-        tag_map = {}
         for tag_data in data.get('tags', []):
             existing_tag = Tag.query.filter_by(name=tag_data['name']).first()
             if not existing_tag:
                 new_tag = Tag(name=tag_data['name'])
                 db.session.add(new_tag)
                 db.session.flush()
-                tag_map[tag_data['id']] = new_tag.id
                 imported_count += 1
-            else:
-                tag_map[tag_data['id']] = existing_tag.id
 
         for post_data in data.get('posts', []):
             existing_post = Post.query.filter_by(slug=post_data['slug']).first()
