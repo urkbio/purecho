@@ -14,7 +14,7 @@ from flask_wtf.csrf import CSRFProtect
 
 # 本地应用模块
 from models import db, Post, Tag, AdminPassword
-from data_manager import export_data, import_data, load_backup
+from services.data_manager import export_data, import_data, load_backup
 
 # 加载环境变量
 load_dotenv()

@@ -13,9 +13,9 @@ import argparse
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from app import app
-from data_manager import export_data as export_backup_data
-from data_manager import import_data as import_backup_data
-from data_manager import load_backup
+from services.data_manager import export_data as export_backup_data
+from services.data_manager import import_data as import_backup_data
+from services.data_manager import load_backup
 
 
 def export_data(output_file=None):
