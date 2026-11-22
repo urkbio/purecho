@@ -533,17 +533,26 @@ footer hr {
     margin-bottom: 2em;
 }
 
-/* 以下两条定义表格样式 */
+/* Markdown 表格样式 */
 .post-content table {
     border-collapse: collapse;
     width: 100%;
     margin: 1.5em 0;
+    border: 1px solid var(--border-color);
 }
 
-.post-content th, .post-content td {
-    /* 仅仅设置线条，不设背景 */
-    border: 1px solid #eee; 
-    padding: 12px;
+.post-content th,
+.post-content td {
+    border: 1px solid var(--border-color);
+    padding: 12px 16px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.post-content th {
+    background-color: var(--bg-color);
+    border-bottom-width: 2px;
+    font-weight: 600;
 }
 
 /* Responsive images and media */

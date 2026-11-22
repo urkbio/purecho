@@ -26,6 +26,10 @@ def render_markdown(text):
             'a': {'href', 'title'},
             'img': {'src', 'alt', 'title'}
         },
+        tag_attribute_values={
+            'th': {'style': {'text-align: left', 'text-align: center', 'text-align: right'}},
+            'td': {'style': {'text-align: left', 'text-align: center', 'text-align: right'}}
+        },
         url_schemes={'http', 'https', 'mailto'}
     )
 
