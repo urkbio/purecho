@@ -10,6 +10,8 @@ __pycache__/
 *.pyo
 
 # 忽略 IDE 配置文件
+.trae/
+.screenshots/
 .vscode/
 .idea/
 

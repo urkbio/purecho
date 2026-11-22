@@ -1,0 +1,127 @@
+{% extends "admin_base.html" %}
+
+{% block admin_content %}
+<div class="export-container">
+    <h2>数据导出</h2>
+
+    <div class="export-info">
+        <h3>导出说明</h3>
+        <ul>
+            <li>备份包含全部普通文章、独立页面、标签及其关联。</li>
+            <li>服务器会在清空前重新读取并验证备份文件。</li>
+            <li>请确认浏览器下载的 JSON 文件可用；服务器备份也会保留在 backups 目录。</li>
+        </ul>
+    </div>
+
+    <section class="export-card">
+        <h3>仅导出</h3>
+        <p>生成并下载完整备份，不修改现有内容。</p>
+        <form method="post" action="{{ url_for('admin_export') }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-primary">导出全部数据</button>
+        </form>
+    </section>
+
+    <section class="export-card export-danger">
+        <h3>导出并清空</h3>
+        <p>备份验证成功后，将删除全部普通文章、独立页面、标签及文章标签关联。</p>
+        <p><strong>管理员密码、站点配置和服务器备份文件会保留。</strong></p>
+        <form method="post" action="{{ url_for('admin_export_clear') }}"
+              onsubmit="return confirm('确认继续吗？服务器备份验证成功后，将清空全部文章、独立页面和标签。');">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <label class="confirm-label">
+                <input type="checkbox" name="confirm_clear" value="1" required>
+                我已了解清空范围，并确认在备份验证成功后执行清空。
+            </label>
+            <button type="submit" class="btn btn-danger">导出并清空全部内容</button>
+        </form>
+    </section>
+
+    <div class="form-actions">
+        <a href="{{ url_for('admin') }}" class="btn btn-secondary">返回</a>
+    </div>
+</div>
+
+<style>
+.export-container {
+    max-width: 650px;
+    margin: 0 auto;
+}
+
+.export-info,
+.export-card {
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    padding: 24px;
+    margin-bottom: 24px;
+}
+
+.export-info {
+    background: #f8f9fa;
+}
+
+.export-info h3,
+.export-card h3 {
+    margin-top: 0;
+}
+
+.export-info ul {
+    margin-bottom: 0;
+    padding-left: 20px;
+}
+
+.export-info li {
+    margin-bottom: 8px;
+    color: #666;
+}
+
+.export-card {
+    background: white;
+}
+
+.export-danger {
+    border-color: #e0a7a7;
+    background: #fff8f8;
+}
+
+.confirm-label {
+    display: block;
+    margin: 20px 0;
+    line-height: 1.6;
+    cursor: pointer;
+}
+
+.confirm-label input {
+    margin-right: 8px;
+}
+
+.form-actions {
+    margin-top: 24px;
+}
+
+.btn {
+    display: inline-block;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.btn-primary {
+    background: #007bff;
+    color: white;
+}
+
+.btn-danger {
+    background: #c82333;
+    color: white;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+}
+</style>
+{% endblock %}

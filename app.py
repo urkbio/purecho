@@ -14,7 +14,7 @@ from flask_sqlalchemy.pagination import Pagination
 
 # 本地应用模块
 from models import db, Post, Tag, AdminPassword
-from services.data_manager import export_data, import_data, load_backup
+from services.data_manager import export_and_clear_data, export_data, import_data, load_backup
 from services.markdown import render_html
 from services.search import search_posts
 
@@ -328,19 +328,45 @@ def api_tags():
     tag_list = [tag.name for tag in tags]
     return {'tags': tag_list}
 
-@app.route('/admin/export')
+@app.route('/admin/export', methods=['GET', 'POST'])
 @login_required
 def admin_export():
-    """导出所有数据为JSON文件"""
+    """显示导出选项或导出所有数据为JSON文件"""
+    if request.method == 'GET':
+        current_year = datetime.now().year
+        return render_template('admin_export.html', year=current_year, config=app.config)
+
     try:
         export_path, _, _ = export_data()
         export_filename = os.path.basename(export_path)
         flash(f'数据导出成功！文件：{export_filename}')
         return send_file(export_path, as_attachment=True, download_name=export_filename)
-        
+
     except Exception as e:
         flash(f'导出失败：{str(e)}')
-        return redirect(url_for('admin'))
+        return redirect(url_for('admin_export'))
+
+
+@app.route('/admin/export/clear', methods=['POST'])
+@login_required
+def admin_export_clear():
+    """验证备份后清空全部文章、页面和标签"""
+    if request.form.get('confirm_clear') != '1':
+        flash('请先确认已了解清空范围，再执行导出并清空')
+        return redirect(url_for('admin_export'))
+
+    try:
+        export_path, post_count, tag_count = export_and_clear_data()
+    except Exception as e:
+        flash(f'导出并清空失败：{str(e)}')
+        return redirect(url_for('admin_export'))
+
+    export_filename = os.path.basename(export_path)
+    flash(
+        f'数据导出并清空成功！文件：{export_filename}；'
+        f'共备份 {post_count} 条内容记录和 {tag_count} 个标签'
+    )
+    return send_file(export_path, as_attachment=True, download_name=export_filename)
 
 @app.route('/admin/import', methods=['GET', 'POST'])
 @login_required

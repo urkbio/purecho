@@ -4,7 +4,7 @@ import json
 import os
 from datetime import datetime
 
-from models import db, Post, Tag
+from models import db, Post, Tag, post_tags
 
 
 def _validate_backup(data):
@@ -72,6 +72,23 @@ def export_data(output_file=None):
         json.dump(export_data, f, ensure_ascii=False, indent=2)
 
     return output_path, len(posts), len(tags)
+
+
+def export_and_clear_data():
+    """验证备份文件后，在一个事务中清空文章、页面和标签"""
+    output_path, post_count, tag_count = export_data()
+    load_backup(output_path)
+
+    try:
+        db.session.execute(post_tags.delete())
+        Post.query.delete(synchronize_session=False)
+        Tag.query.delete(synchronize_session=False)
+        db.session.commit()
+    except Exception:
+        db.session.rollback()
+        raise
+
+    return output_path, post_count, tag_count
 
 
 def import_data(data):
