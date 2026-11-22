@@ -35,6 +35,33 @@ csrf = CSRFProtect(app)
 db.init_app(app)
 
 
+_EMBEDDED_RESIZE_SCRIPT = """
+<script>
+(function () {
+    function sendHeight() {
+        var height = Math.max(
+            document.body ? document.body.scrollHeight : 0,
+            document.documentElement.scrollHeight,
+            document.body ? document.body.offsetHeight : 0,
+            document.documentElement.offsetHeight
+        );
+        parent.postMessage({type: 'purecho-embedded-resize', height: height}, '*');
+    }
+
+    if (window.ResizeObserver) {
+        var observer = new ResizeObserver(sendHeight);
+        observer.observe(document.documentElement);
+        if (document.body) {
+            observer.observe(document.body);
+        }
+    }
+    window.addEventListener('load', sendHeight);
+    sendHeight();
+})();
+</script>
+"""
+
+
 class SearchPagination(Pagination):
     """为内存搜索结果提供与 ORM 分页一致的接口。"""
 
@@ -119,7 +146,7 @@ def post(slug):
     post = Post.query.filter_by(slug=slug).first_or_404()
     content = render_markdown(post.content)
     current_year = datetime.now().year
-    return render_template('post.html', title=post.title, content=content, year=current_year, post=post, config=app.config)
+    return render_template('post.html', title=post.title, content=content, raw_html=None, year=current_year, post=post, config=app.config)
 
 @app.route('/tag/<name>')
 def tag(name):
@@ -132,9 +159,12 @@ def tag(name):
 @app.route('/page/<slug>')
 def page(slug):
     page = Post.query.filter_by(slug=slug, is_page=True).first_or_404()
-    content = render_markdown(page.content)
+    source = page.content.lstrip('\ufeff \t\r\n')
+    is_embedded = source.lower().startswith(('<!doctype html', '<html'))
+    raw_html = (page.content + _EMBEDDED_RESIZE_SCRIPT) if is_embedded else None
+    content = render_markdown(page.content) if raw_html is None else None
     current_year = datetime.now().year
-    return render_template('post.html', title=page.title, content=content, year=current_year, post=page, config=app.config)
+    return render_template('post.html', title=page.title, content=content, raw_html=raw_html, year=current_year, post=page, config=app.config)
 
 @app.route('/feed.xml')
 def feed():

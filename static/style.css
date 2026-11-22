@@ -561,6 +561,14 @@ img, video, iframe {
     height: auto;
 }
 
+.embedded-page {
+    display: block;
+    width: 100%;
+    height: 480px;
+    overflow: hidden;
+    border: 0;
+}
+
 /* Dark mode support (optional) */
 @media (prefers-color-scheme: dark) {
     :root {

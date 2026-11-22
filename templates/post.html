@@ -10,7 +10,32 @@
     <span class="post-date">· 最后修改：{{ post.updated_at.strftime('%Y-%m-%d %H:%M:%S') }}</span>
     {% endif %}
 </div>
+{% if raw_html %}
+<iframe
+    class="embedded-page"
+    srcdoc="{{ raw_html }}"
+    sandbox="allow-scripts allow-popups"
+    scrolling="no"
+    title="{{ title }}"
+></iframe>
+<script>
+(function () {
+    var frame = document.querySelector('.embedded-page');
+    window.addEventListener('message', function (event) {
+        if (event.source !== frame.contentWindow || !event.data ||
+            event.data.type !== 'purecho-embedded-resize') {
+            return;
+        }
+        var height = Number(event.data.height);
+        if (Number.isFinite(height) && height > 0) {
+            frame.style.height = Math.min(Math.ceil(height), 20000) + 'px';
+        }
+    });
+})();
+</script>
+{% else %}
 <div class="post-content">{{ content|safe }}</div>
+{% endif %}
 {% if not post.is_page and post.tags %}
 <div class="post-meta">
     <span class="post-tags">标签：
